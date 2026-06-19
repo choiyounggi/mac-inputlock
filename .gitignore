@@ -1,0 +1,11 @@
+# 빌드 산출물
+InputLock.app/
+*.zip
+sha256.txt
+
+# 로컬 실행 흔적
+*.log
+/inputlock
+
+# macOS
+.DS_Store

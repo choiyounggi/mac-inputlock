@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build .app bundle + zip
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          chmod +x build.sh
+          ./build.sh "$VERSION"
+
+      - name: Compute sha256 (for Homebrew cask)
+        run: |
+          shasum -a 256 InputLock-*.zip | tee sha256.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            InputLock-*.zip
+          body: |
+            ## InputLock ${{ github.ref_name }}
+
+            화면은 켜둔 채 키보드·마우스 입력을 전역 차단하는 개인 잠금. 토글: ⌃⌥⌘L
+
+            ### Homebrew 설치
+            ```
+            brew install --cask <OWNER>/tap/inputlock
+            ```
+
+            아래 zip의 sha256 값을 tap 레포의 `Casks/inputlock.rb` `sha256`에 반영하세요.
